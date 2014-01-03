@@ -49,16 +49,6 @@ Select an entry or enter a new value: 2
 At this point, every file that matched `*.mkv` will be moved into 
 `/mnt/media/TV_shows/Some show/season_2`.
 
-### Alternate Collection Path
-
-A non-default collection path can be passed by setting the `TV_SHOWS` 
-environment variable. Place an `export` line in a shell startup file to 
-make this permanent.
-
-```
-$ TV_SHOWS="$HOME/Shows" mvtv *.mkv
-```
-
 ### New Values
 
 Add new shows or seasons by typing the name. Note that any invalid 
@@ -79,3 +69,14 @@ Select an entry or enter a new value: season_1
 
 This will move `*.mkv` into `/mnt/media/TV_shows/New show/season_1`, 
 creating the directories as needed.
+
+### Alternate Collection Path
+
+A non-default collection path can be passed by setting the `TV_SHOWS` 
+environment variable.
+
+```
+$ TV_SHOWS="$HOME/Shows" mvtv *.mkv
+```
+
+Place an `export` line in a shell startup file to make this permanent.
