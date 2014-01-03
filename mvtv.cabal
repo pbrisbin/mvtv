@@ -1,0 +1,18 @@
+name:          mvtv
+version:       0.0.1
+synopsis:      Move TV shows
+description:   Add TV show files to a media collection
+homepage:      http://github.com/pbrisbin/mvtv
+license:       MIT
+copyright:     (c) 2014 Pat Brisbin
+author:        Pat Brisbin <pbrisbin@gmail.com>
+maintainer:    Pat Brisbin <pbrisbin@gmail.com>
+build-type:    Simple
+cabal-version: >= 1.8
+
+executable mvtv
+  main-is: main.hs
+  ghc-options: -Wall
+  build-depends: base == 4.*
+               , directory
+               , filepath
