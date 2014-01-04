@@ -1,53 +1,62 @@
 module Main (main) where
 
-import Control.Monad (when)
-import Data.Maybe (fromJust, fromMaybe)
-import System.Directory (createDirectoryIfMissing, renameFile)
-import System.Directory.SelectFile
-import System.Environment (getArgs, lookupEnv)
-import System.Exit (exitFailure)
-import System.FilePath (pathSeparator, joinPath, takeFileName, (</>))
-import System.IO (hPutStrLn, stderr)
+import MvTv.Resolve
+
+import Control.Monad
+import Data.Maybe
+import System.Directory
+import System.Environment
+import System.Exit
+import System.FilePath
+import System.IO
 
 main :: IO ()
 main = do
     files <- getArgs
 
     when (null files) $ do
-        hPutStrLn stderr "usage: mvtv FILE [, ...]"
+        putErr "usage: mvtv FILE [, ...]"
         exitFailure
 
-    path <- getPath
+    media <- getMedia
+    shows <- subDirectories media
 
-    mapM_ (moveTo path) files
+    forM_ files $ \file -> do
+        case resolveShow file shows of
+            Nothing   -> putErr $ "Unable to resolve show for " ++ file
+            Just show -> do
+                seasons <- subDirectories $ media </> show
 
-getPath :: IO FilePath
-getPath =   selectOrCreateFrom -- choose season
-        =<< selectOrCreateFrom -- choose show
-        =<< getMedia
+                let path = media </> resolvePath show seasons file
+                    directory = takeDirectory path
 
-selectOrCreateFrom :: FilePath -> IO FilePath
-selectOrCreateFrom = fmap fromJust . selectFile menuConfig False
-
-    where
-        menuConfig :: MenuConfig
-        menuConfig = defaultMenuConfig
-            { menuPrompt    = "Select an entry or enter a new value: "
-            , menuOnInvalid = \parent input ->
-                return $ Just $ parent </> input
-            }
+                putStrLn $ file ++ " -> " ++ path
+                createDirectoryIfMissing True directory
+                copyFile file path
+                removeFile file
 
 getMedia :: IO FilePath
-getMedia = do
-    let def = pathSeparator : joinPath ["mnt", "media", "TV_shows"]
+getMedia = fmap (fromMaybe defaultMedia) $ lookupEnv "TV_SHOWS"
 
-    fmap (fromMaybe def) $ lookupEnv "TV_SHOWS"
+    where
+        defaultMedia :: FilePath
+        defaultMedia = pathSeparator
+                     : joinPath ["mnt", "media", "TV_shows"]
 
-moveTo :: FilePath -> FilePath -> IO ()
-moveTo directory file = do
-    let destination = directory </> takeFileName file
+subDirectories :: FilePath -> IO [FilePath]
+subDirectories directory = do
+    contents <- getDirectoryContents directory
 
-    createDirectoryIfMissing True directory
+    fmap (filter visible) $ filterM (isDirectory directory) contents
 
-    putStrLn $ file ++ " -> " ++ destination
-    renameFile file destination
+    where
+        visible :: FilePath -> Bool
+        visible ('.':_) = False
+        visible _       = True
+
+        isDirectory :: FilePath -> FilePath -> IO Bool
+        isDirectory parent directory = doesDirectoryExist
+                                     $ parent </> directory
+
+putErr :: String -> IO ()
+putErr = hPutStrLn stderr
