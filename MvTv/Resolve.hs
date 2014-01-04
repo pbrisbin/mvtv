@@ -16,7 +16,7 @@ resolveShow file = find $ matches file
 
     where
         matches :: FilePath -> String -> Bool
-        matches file show = lower show `isInfixOf` normalize file
+        matches f s = lower s `isInfixOf` normalize f
 
         normalize :: FilePath -> FilePath
         normalize = substitute ".-_" ' ' . lower
@@ -31,11 +31,11 @@ resolveShow file = find $ matches file
 
 -- | Given a show and potential seasons, return the full path
 resolvePath :: String -> [String] -> FilePath -> FilePath
-resolvePath show seasons file =
+resolvePath s seasons file =
     let fileName = takeFileName file
     in  case getSeason file of
-            Nothing     -> show </> fileName
-            Just season -> show </> resolveSeason season seasons </> fileName
+            Nothing     -> s </> fileName
+            Just season -> s </> resolveSeason season seasons </> fileName
 
 resolveSeason :: Int -> [String] -> String
 resolveSeason season = fromMaybe (defaultSeason season)
@@ -61,9 +61,7 @@ getSeason file = matchFirst file
 
     where
         matchFirst :: FilePath -> [String] -> Maybe Int
-        matchFirst file = listToMaybe . mapMaybe (matchOne file)
+        matchFirst f = listToMaybe . mapMaybe (matchOne f)
 
         matchOne :: FilePath -> String -> Maybe Int
-        matchOne file = fmap (read)
-                      . listToMaybe . reverse . concat
-                      . (=~) file
+        matchOne f = fmap (read) . listToMaybe . reverse . concat . (=~) f

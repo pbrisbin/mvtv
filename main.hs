@@ -19,15 +19,15 @@ main = do
         exitFailure
 
     media <- getMedia
-    shows <- subDirectories media
+    ss    <- subDirectories media
 
     forM_ files $ \file -> do
-        case resolveShow file shows of
+        case resolveShow file ss of
             Nothing   -> putErr $ "Unable to resolve show for " ++ file
-            Just show -> do
-                seasons <- subDirectories $ media </> show
+            Just s -> do
+                seasons <- subDirectories $ media </> s
 
-                let path = media </> resolvePath show seasons file
+                let path = media </> resolvePath s seasons file
                     directory = takeDirectory path
 
                 putStrLn $ file ++ " -> " ++ path
@@ -55,8 +55,7 @@ subDirectories directory = do
         visible _       = True
 
         isDirectory :: FilePath -> FilePath -> IO Bool
-        isDirectory parent directory = doesDirectoryExist
-                                     $ parent </> directory
+        isDirectory parent d = doesDirectoryExist $ parent </> d
 
 putErr :: String -> IO ()
 putErr = hPutStrLn stderr
