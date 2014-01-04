@@ -16,3 +16,4 @@ executable mvtv
   build-depends: base == 4.*
                , directory
                , filepath
+               , regex-posix
