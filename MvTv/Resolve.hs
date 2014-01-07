@@ -16,10 +16,10 @@ resolveShow file = find $ matches file
 
     where
         matches :: FilePath -> String -> Bool
-        matches f s = lower s `isInfixOf` normalize f
+        matches f s = normalize s `isInfixOf` normalize f
 
         normalize :: FilePath -> FilePath
-        normalize = substitute "._" ' ' . lower
+        normalize = substitute "._-" ' ' . lower
 
         lower :: String -> String
         lower = map toLower
