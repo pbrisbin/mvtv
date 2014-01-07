@@ -19,21 +19,17 @@ main = do
         exitFailure
 
     media <- getMedia
-    ss    <- subDirectories media
+    titles <- subDirectories media
 
     forM_ files $ \file -> do
-        case resolveShow file ss of
-            Nothing   -> putErr $ "Unable to resolve show for " ++ file
-            Just s -> do
-                seasons <- subDirectories $ media </> s
+        case resolveShow file titles of
+            Nothing -> putErr $ "Unable to resolve show for " ++ file
+            Just title -> do
+                putStrLn $ "* " ++ takeFileName file
+                putStrLn $ "  -> " ++ title
 
-                let path = media </> resolvePath s seasons file
-                    directory = takeDirectory path
-
-                putStrLn $ file ++ " -> " ++ path
-                createDirectoryIfMissing True directory
-                copyFile file path
-                removeFile file
+                seasons <- subDirectories $ media </> title
+                moveFile file $ media </> resolvePath title seasons file
 
 getMedia :: IO FilePath
 getMedia = fmap (fromMaybe defaultMedia) $ lookupEnv "TV_SHOWS"
@@ -56,6 +52,14 @@ subDirectories directory = do
 
         isDirectory :: FilePath -> FilePath -> IO Bool
         isDirectory parent d = doesDirectoryExist $ parent </> d
+
+moveFile :: FilePath -> FilePath -> IO ()
+moveFile from to = do
+    let directory = takeDirectory to
+
+    createDirectoryIfMissing True directory
+    copyFile from to
+    removeFile from
 
 putErr :: String -> IO ()
 putErr = hPutStrLn stderr
