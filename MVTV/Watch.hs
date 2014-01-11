@@ -4,16 +4,18 @@ import System.Directory
 import System.INotify
 
 initWatch :: IO () -> IO ()
-initWatch f = do
+initWatch action = do
     directory <- getCurrentDirectory
 
     withINotify $ \inotify -> do
-        wd <- addWatch inotify [Create] directory $ handler f
+        wd <- addWatch inotify [Create] directory $ handler action
 
         putStrLn $ "Watching " ++ directory ++ ", press Enter to stop."
-        getLine
+        _ <- getLine
 
         removeWatch wd
 
     where
-        handler f (Created _ _) = f
+        handler :: IO () -> (Event -> IO ())
+        handler a (Created _ _) = a
+        handler _ _ = return ()

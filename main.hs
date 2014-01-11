@@ -7,7 +7,6 @@ import MVTV.Watch
 import Control.Monad
 import Data.Maybe
 import System.Environment
-import System.INotify
 
 main :: IO ()
 main = do
