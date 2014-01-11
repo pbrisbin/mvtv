@@ -17,3 +17,4 @@ executable mvtv
                , directory
                , filepath
                , regex-posix
+               , hinotify

@@ -1,4 +1,4 @@
-module MvTv.Directory
+module MVTV.Directory
     ( subDirectories
     , recursiveContents
     , moveFile

@@ -1,4 +1,4 @@
-module MvTv.Resolve
+module MVTV.Resolve
     ( resolveShow
     , resolvePath
     ) where

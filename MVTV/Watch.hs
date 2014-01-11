@@ -1,4 +1,4 @@
-module MvTv.Watch (initWatch) where
+module MVTV.Watch (initWatch) where
 
 import System.Directory
 import System.INotify

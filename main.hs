@@ -1,8 +1,8 @@
 module Main (main) where
 
-import MvTv.Directory
-import MvTv.Resolve
-import MvTv.Watch
+import MVTV.Directory
+import MVTV.Resolve
+import MVTV.Watch
 
 import Control.Monad
 import Data.Maybe
